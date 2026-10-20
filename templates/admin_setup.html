@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 500px;">
+    <h2>Create Administrator Account</h2>
+    <p>Use your setup token to create the first administrator.</p>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="setup_token" class="form-label">Setup Token</label>
+            <input type="password" id="setup_token" name="setup_token" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" minlength="2" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" minlength="8" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">
+                Confirm Password
+            </label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" minlength="8"
+                required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Create Administrator
+        </button>
+    </form>
+</div>
+{% endblock %}

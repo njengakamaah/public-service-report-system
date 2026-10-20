@@ -210,7 +210,60 @@ def login():
             return redirect(url_for("dashboard"))
 
     return render_template("login.html")
+@app.route("/setup-admin", methods=("GET", "POST"))
+def setup_admin():
+    """Allow one-time admin creation using a secret setup token."""
+    setup_token = os.environ.get("ADMIN_SETUP_TOKEN")
 
+    # Disable setup if the environment token is missing.
+    if not setup_token:
+        abort(404)
+
+    db = get_db()
+
+    # Only allow setup when no administrator exists.
+    existing_admin = db.execute(
+        "SELECT id FROM users WHERE role = 'admin' LIMIT 1"
+    ).fetchone()
+
+    if existing_admin:
+        abort(404)
+
+    if request.method == "POST":
+        submitted_token = request.form.get("setup_token", "")
+        full_name = request.form.get("full_name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        confirm = request.form.get("confirm_password", "")
+
+        if not secrets.compare_digest(submitted_token, setup_token):
+            abort(403)
+
+        if len(full_name) < 2 or "@" not in email:
+            flash("Enter a valid name and email.", "danger")
+        elif len(password) < 8:
+            flash("Password must be at least 8 characters.", "danger")
+        elif password != confirm:
+            flash("Passwords do not match.", "danger")
+        else:
+            try:
+                db.execute(
+                    """INSERT INTO users
+                       (full_name, email, password_hash, role)
+                       VALUES (?, ?, ?, 'admin')""",
+                    (full_name, email, generate_password_hash(password))
+                )
+                db.commit()
+                flash(
+                    "Administrator created. Please log in.",
+                    "success"
+                )
+                return redirect(url_for("login"))
+            except sqlite3.IntegrityError:
+                db.rollback()
+                flash("An account with that email already exists.", "danger")
+
+    return render_template("admin_setup.html")
 
 @app.post("/logout")
 @login_required
