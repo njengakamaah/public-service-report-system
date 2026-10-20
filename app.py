@@ -95,6 +95,8 @@ def init_db():
     db.commit()
     db.close()
 
+# Ensure database tables exist when the app starts on Render.
+init_db()
 
 def login_required(view):
     """Allow access only to signed-in users."""
