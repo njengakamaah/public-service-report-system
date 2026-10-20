@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ report['reference'] }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">REPORT DETAILS</p>
+        <h1>{{ report['category'] }}</h1>
+        <p class="reference">{{ report['reference'] }}</p>
+    </div><a class="button button-outline" href="{{ url_for('dashboard') }}">← Back to dashboard</a>
+</div>
+<div class="detail-grid">
+    <section class="panel detail-panel">
+        <div class="detail-status"><span class="status status-{{ report['status']|lower|replace(' ', '-') }}">{{
+                report['status'] }}</span></div>
+        <h2>Issue information</h2>
+        <p class="muted">Location</p>
+        <p>{{ report['location'] }}</p>
+        <p class="muted">Description</p>
+        <p class="description-text">{{ report['description'] }}</p>
+        {% if report['image_filename'] %}<p class="muted">Attached image</p><img class="report-image"
+            src="{{ url_for('uploaded_image', filename=report['image_filename']) }}"
+            alt="Image attached to this service report">{% endif %}
+        <p class="muted">Submitted: {{ report['created_at'] }}</p>
+        <p class="muted">Last updated: {{ report['updated_at'] }}</p>
+        {% if g.user['role'] == 'admin' %}<p class="muted">Citizen: {{ report['citizen_name'] }} ({{
+            report['citizen_email'] }})</p>{% endif %}
+    </section>
+    <aside class="panel detail-panel">
+        <h2>Status history</h2>
+        <ol class="timeline">
+            {% for item in history %}
+            <li><span class="timeline-dot"></span>
+                <div><strong>{{ item['new_status'] }}</strong><small>{{ item['changed_at'] }}</small><small>Updated by
+                        {{ item['changed_by_name'] }}</small>{% if item['note'] %}<p>{{ item['note'] }}</p>{% endif %}
+                </div>
+            </li>
+            {% else %}
+            <li>No status history yet.</li>
+            {% endfor %}
+        </ol>
+    </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}New report{% endblock %}
+{% block content %}
+<section class="form-layout form-layout-wide">
+    <div class="form-intro">
+        <h1>What needs attention?</h1>
+        <div class="tip-box"><strong>For exact location</strong>
+            <p>Include a nearby landmark or street name in the location field.</p>
+        </div>
+    </div>
+    <form class="panel form-panel" method="post" enctype="multipart/form-data">
+        <label for="category">Issue category</label>
+        <select id="category" name="category" required>
+            <option value="">Choose a category</option>
+            {% for category in categories %}<option value="{{ category }}">{{ category }}</option>{% endfor %}
+        </select>
+        <label for="location">Location</label>
+        <input id="location" name="location" type="text" maxlength="200"
+            placeholder="e.g. University Road, near the market" required>
+        <label for="description">Describe the issue</label>
+        <textarea id="description" name="description" rows="6" minlength="10" maxlength="2000"
+            placeholder="What happened, and when did you notice it?" required></textarea>
+        <label for="image">Attach an image (optional)</label>
+        <input id="image" name="image" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp">
+        <small>PNG, JPG, JPEG, or WEBP. Maximum 3 MB.</small>
+        <button class="button button-full" type="submit">Submit report</button>
+        <p class="form-bottom"><a href="{{ url_for('dashboard') }}">Cancel and return to dashboard</a></p>
+    </form>
+</section>
+{% endblock %}

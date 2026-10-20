@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Overview and status update</h1>
+    </div>
+</div>
+<section class="stats-grid">
+    <article class="stat-card"><span class="stat-label">All reports</span><strong>{{ counts.total }}</strong><span
+            class="stat-foot">Total submitted</span></article>
+    <article class="stat-card"><span class="stat-label">Open reports</span><strong>{{ counts.open }}</strong><span
+            class="stat-foot">Pending or in progress</span></article>
+    <article class="stat-card"><span class="stat-label">Resolved</span><strong>{{ counts.resolved }}</strong><span
+            class="stat-foot">Marked as resolved</span></article>
+</section>
+
+{% if reports %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Reference</th>
+                <th>Issue</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Update status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td><strong>{{ report['reference'] }}</strong><small>{{ report['citizen_name'] }}</small><small>{{
+                        report['citizen_email'] }}</small><a class="table-link"
+                        href="{{ url_for('request_detail', request_id=report['id']) }}">View details</a></td>
+                <td>{{ report['category'] }}<small>{{ report['created_at'] }}</small></td>
+                <td>{{ report['location'] }}</td>
+                <td><span class="status status-{{ report['status']|lower|replace(' ', '-') }}">{{ report['status']
+                        }}</span></td>
+                <td>
+                    <form class="status-form" method="post"
+                        action="{{ url_for('update_status', request_id=report['id']) }}">
+                        <select name="status" aria-label="New status for {{ report['reference'] }}">
+                            {% for status in ['Pending', 'In Progress', 'Resolved'] %}
+                            <option value="{{ status }}" {% if status==report['status'] %}selected{% endif %}>{{ status
+                                }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="note" maxlength="500" placeholder="Optional note"
+                            aria-label="Status note">
+                        <button class="button button-small" type="submit">Save</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <h2>No reports have been submitted</h2>
+</div>
+{% endif %}
+{% endblock %}
